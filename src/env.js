@@ -1,5 +1,5 @@
 const variables = {
-    APIKEY: 'AIzaSyCMjGr5TUHvrvREISD6DxzhOlo6ysPk5HQ'
+    APIKEY: '<APIKEY>'
 }
 
 export default variables;
