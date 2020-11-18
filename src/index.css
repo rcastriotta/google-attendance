@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #F5F5FB;
+    font-family: "averta-regular", "averta-bold";
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@font-face {
+    font-family: 'averta-bold';
+    src: local('MyFont'), url(./fonts/averta-bold.ttf) format('woff');
+}
+
+@font-face {
+    font-family: 'averta-regular';
+    src: local('MyFont'), url(./fonts/averta-regular.otf) format('woff');
+}

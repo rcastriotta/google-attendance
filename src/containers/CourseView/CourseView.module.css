@@ -1,0 +1,41 @@
+.TopContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.GoBack {
+    display: flex;
+    flex-direction: row;
+    color: rgba(94, 129, 244, 1);
+    align-items: center;
+    width: 200px;
+    cursor: pointer;
+    font-size: 22px;
+    font-family: "averta-bold";
+    transition: all .2s ease-in-out;
+}
+
+.GoBack:hover {
+    transform: scale(1.05);
+}
+
+.Placeholder {
+    width: 200px;
+}
+
+.CourseView {
+    min-width: 600px;
+    max-width: 1300px;
+    margin: auto;
+}
+
+.BottomContainer {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
