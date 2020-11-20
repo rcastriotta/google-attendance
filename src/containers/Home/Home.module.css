@@ -1,9 +1,7 @@
 .Home {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    width: 100%;
+    min-width: 430px;
+    max-width: 1250px;
+    margin: auto;
 }
 
 .Tiles {
@@ -13,15 +11,15 @@
 .Tile {
     background-color: white;
     border-radius: 10px;
-    margin-left: 50px;
-    margin-right: 50px;
-    margin-top: 30px;
+    margin-left: 30px;
+    margin-right: 35px;
+    margin-top: 35px;
     margin-bottom: 25px;
     min-height: 250px;
     min-width: 350px;
     width: auto;
     height: '100% !important';
-    box-shadow: 0px 3px 30px 2px rgba(94, 129, 244, .1);
+    box-shadow: 0px 3px 30px 2px rgba(34, 38, 51, 0.1);
     cursor: pointer;
     transition: all .2s ease-in-out;
 }
@@ -32,8 +30,6 @@
 
 .NameContainer {
     text-align: left;
-    padding-left: 100px;
-    padding-right: 100px;
     color: rgba(94, 129, 244, 1);
     font-family: "averta-bold";
     display: flex;
@@ -41,6 +37,7 @@
     justify-content: space-between;
     align-items: center;
     min-width: 350px;
+    width: 100%;
 }
 
 .Total {
@@ -95,4 +92,5 @@
 
 .Ellipse {
     cursor: pointer;
+    margin-right: 50px;
 }

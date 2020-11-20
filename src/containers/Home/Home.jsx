@@ -20,6 +20,7 @@ const Home = (props) => {
     const name = useGoogleAuth().googleUser.profileObj.givenName
     const [anchorEl, open] = React.useState(null);
     const { signOut } = useGoogleAuth();
+    const { refreshUser } = useGoogleAuth()
 
 
     useEffect(() => {
@@ -35,8 +36,13 @@ const Home = (props) => {
                 const activeCourses = courses.filter(course => course.ownerId === googleId)
                 setCourses(activeCourses)
             })
-            .catch(() => setIsLoading(false))
-    }, [accessToken, googleId])
+            .catch((err) => {
+                if (err.toString().includes('401')) {
+                    refreshUser()
+                }
+                setIsLoading(false)
+            })
+    }, [accessToken, googleId, props.history, refreshUser])
 
     const handleClick = event => {
         open(event.currentTarget);
@@ -51,7 +57,7 @@ const Home = (props) => {
     return (
         <div className={styles.Home}>
             <div className={styles.NameContainer}>
-                <div>
+                <div style={{ marginLeft: '50px' }}>
                     <h2>Hello, {name}</h2>
                     <div className={styles.Total}>
                         <p>ACTIVE CLASSES</p>
@@ -77,37 +83,41 @@ const Home = (props) => {
 
 
             </div>
-            {!isLoading && <GridList cellHeight={160} cols={4} className={styles.Tiles} spacing={0} style={{ justifyContent: 'space-between', overflow: 'visible' }} >
-                {courses.map((course) => (
-                    <GridListTile key={course.id} cols={1} className={styles.Tile} onClick={() => props.history.push(`/courses/${course.id}`)}>
-                        <div className={styles.TileTop}>
-                            <h3>{course.name}</h3>
-                            <div className={styles.Date}>
-                                <p style={{ color: 'gray' }}>Created</p>
-                                <div className={styles.Divider} />
-                                <p style={{ color: 'rgba(94, 129, 244, 1)' }}>{dateformat(course.creationTime)}</p>
-                            </div>
+            {!isLoading && <GridList cellHeight={160} cols={4} className={styles.Tiles} padding={20} spacing={0} style={{ overflow: 'visible' }} >
+                {courses.map((course) => {
+                    return (
+                        <GridListTile key={course.id} cols={1} className={styles.Tile} onClick={() => props.history.push(`/courses/${course.id}`)}>
+                            <div className={styles.TileTop}>
+                                <h3>{course.name}</h3>
+                                <div className={styles.Date}>
+                                    <p style={{ color: 'gray' }}>Created</p>
+                                    <div className={styles.Divider} />
+                                    <p style={{ color: 'rgba(94, 129, 244, 1)' }}>{dateformat(course.creationTime)}</p>
+                                </div>
 
-                        </div>
-                        <div className={styles.TileBottom}>
-                            <div className={styles.ViewAttendance}>
-                                <span>View attendance</span>
-                                <MdArrowForward color={"rgba(94, 129, 244, 1)"} size={25} style={{ marginLeft: "10px", marginRight: "20px" }} />
                             </div>
-                        </div>
-                    </GridListTile>
-                ))}
+                            <div className={styles.TileBottom}>
+                                <div className={styles.ViewAttendance}>
+                                    <span>View attendance</span>
+                                    <MdArrowForward color={"rgba(94, 129, 244, 1)"} size={25} style={{ marginLeft: "10px", marginRight: "20px" }} />
+                                </div>
+                            </div>
+                        </GridListTile>
+                    )
+                })}
                 <div style={{ height: '50px' }} />
 
             </GridList>}
             {
-                isLoading && <Loader
-                    type="TailSpin"
-                    color={'rgba(94, 129, 244, 1)'}
-                    height={"100px"}
-                    width={"100px"}
-                    style={{ marginTop: '200px' }}
-                />
+                isLoading && <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                    <Loader
+                        type="TailSpin"
+                        color={'rgba(94, 129, 244, 1)'}
+                        height={"100px"}
+                        width={"100px"}
+                        style={{ marginTop: '200px' }}
+                    />
+                </div>
             }
         </div >
 

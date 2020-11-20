@@ -30,6 +30,8 @@
     min-width: 600px;
     max-width: 1300px;
     margin: auto;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .BottomContainer {
@@ -37,5 +39,4 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 100%;
 }

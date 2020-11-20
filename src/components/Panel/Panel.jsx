@@ -43,6 +43,9 @@ const Panel = (props) => {
                             }}
                         />
                     </div>}
+                {props.noAssignments && <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '70px', marginLeft: '50px', marginRight: '50px', textAlign: 'center' }}>
+                    <span>You've posted no attendance related assignments for this class today.</span>
+                </div>}
             </div>
 
 
