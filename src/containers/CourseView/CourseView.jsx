@@ -47,7 +47,7 @@ const CourseView = (props) => {
         return ret_arr;
     }
 
-    const getData = useCallback((date) => {
+    const getData = useCallback((date, roster) => {
         (async () => {
             try {
                 setLoading(true)
@@ -64,21 +64,34 @@ const CourseView = (props) => {
                 }).then((result) => {
 
                     // get any assignments that were created on the day and that also have a due date on the day
-                    result.data.courseWork.forEach((item) => {
-                        if ("dueDate" in item && "dueTime" in item && sameDay(new Date(item.creationTime), date)) {
-                            const createdAt = new Date(item.creationTime)
+                    if ('courseWork' in result.data) {
 
-                            let hours = item.dueTime.hours
-                            if (hours.toString().length === 1) {
-                                hours = `0${hours}`
-                            }
-                            const dueDate = new Date(`${item.dueDate.year}-${item.dueDate.month}-${item.dueDate.day}T${hours}:${item.dueTime.minutes}:00.000Z`)
+                        result.data.courseWork.forEach((item) => {
+                            if ("dueDate" in item && "dueTime" in item && sameDay(new Date(item.creationTime), date)) {
+                                const createdAt = new Date(item.creationTime)
 
-                            if (sameDay(createdAt, dueDate)) {
-                                assignmentsToday.push(item)
+                                let hours = item.dueTime.hours
+                                if (hours.toString().length === 1) {
+                                    hours = `0${hours}`
+                                }
+
+                                let day = item.dueDate.day
+                                if (day.toString().length === 1) {
+                                    day = `0${day}`
+                                }
+
+                                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"
+                                ];
+
+                                const dueDate = Date.parse(`${day} ${monthNames[item.dueDate.month - 1]} ${item.dueDate.year} ${hours}:${item.dueTime.minutes}:00 GMT`)
+
+                                if (sameDay(createdAt, dueDate)) {
+                                    assignmentsToday.push(item)
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 })
 
                 if (assignmentsToday.length === 0) {
@@ -99,13 +112,18 @@ const CourseView = (props) => {
                     }).then((result) => {
                         const students = [];
 
-                        result.data.studentSubmissions.forEach((submission) => {
-                            if ("late" in submission) {
-                                return
-                            }
-                            students.push(submission.userId)
-                        })
-                        activeStudents.push(...students)
+                        if ('studentSubmissions' in result.data) {
+                            result.data.studentSubmissions.forEach((submission) => {
+                                if ("late" in submission
+                                    || submission.state === "NEW"
+                                    || submission.state === "CREATED") { // add "RETURNED" if necessary
+                                    return
+                                }
+                                students.push(submission.userId)
+                            })
+                            activeStudents.push(...students)
+                        }
+
                     })
                 }))
 
@@ -116,15 +134,14 @@ const CourseView = (props) => {
                 const nonActiveStudentNames = [];
 
                 // loop through class roster and determine whether student is in active students list
-                if (assignmentsToday.length > 0) {
-                    roster.forEach((student) => {
-                        if (activeStudents.filter(AS => AS === student.profile.id).length > 0) {
-                            activeStudentNames.push(`${student.profile.name.familyName}, ${student.profile.name.givenName}`)
-                        } else {
-                            nonActiveStudentNames.push(`${student.profile.name.familyName}, ${student.profile.name.givenName}`)
-                        }
-                    })
-                }
+                roster.forEach((student) => {
+                    if (activeStudents.filter(AS => AS === student.profile.id).length > 0) {
+                        activeStudentNames.push(`${student.profile.name.familyName}, ${student.profile.name.givenName}`)
+                    } else {
+                        nonActiveStudentNames.push(`${student.profile.name.familyName}, ${student.profile.name.givenName}`)
+                    }
+                })
+
 
                 setActiveStudents(activeStudentNames)
                 setNonActiveStudents(nonActiveStudentNames)
@@ -139,12 +156,13 @@ const CourseView = (props) => {
                 setHasError(true)
             }
         })();
-    }, [courseId, accessToken, refreshUser, roster])
+    }, [courseId, accessToken, refreshUser])
 
     useEffect(() => {
-        if (roster.length > 0 || courseName !== '...Loading') {
+        if (courseName !== '...Loading') {
             return;
         }
+
         axios.get(`https://classroom.googleapis.com/v1/courses/${courseId}?key=${variables.APIKEY}`, {
             headers: {
                 authorization: 'Bearer ' + accessToken
@@ -158,10 +176,15 @@ const CourseView = (props) => {
                 authorization: 'Bearer ' + accessToken
             }
         }).then((result) => {
-            setRoster(result.data.students)
-            getData(new Date())
+            let roster = []
+            if ('students' in result.data) {
+                roster = result.data.students
+            }
+            getData(new Date(), roster)
+            setRoster(roster)
+
         })
-    }, [accessToken, courseId, getData, courseName, roster.length])
+    }, [accessToken, courseId, getData, courseName])
 
 
 
@@ -188,7 +211,7 @@ const CourseView = (props) => {
                             onChange={value => {
                                 if (!loading) {
                                     setDate(moment(value).format('MM/DD/YYYY'))
-                                    getData(new Date(value))
+                                    getData(new Date(value), roster)
                                 }
                             }}
                             KeyboardButtonProps={{
